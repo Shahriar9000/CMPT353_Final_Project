@@ -1,3 +1,6 @@
+# Overview
+Apply machine learning and statistical analysis on g-force, linear acceleration and angular velocity data collected from phone sensors, to detect walking patterns of individuals and determine their physical characteristics.
+
 # Data Collection
 
 Data was collected using the Android app, PhysicsToolbox.The data can be found in the folder "Data". Data contains g-foce, linear acceleration & angular velocity data in csv form. 
