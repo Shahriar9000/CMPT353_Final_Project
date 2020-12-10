@@ -1,9 +1,3 @@
-# data_clean.py - Jeff Wang - Tony Ho
-# cd mnt/c/users/17789/desktop/353/final
-
-# python3 data_clean.py
-
-
 import numpy as np
 import pandas as pd
 from scipy import signal
