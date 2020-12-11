@@ -81,14 +81,14 @@ def main():
         walk_df = remove_noise_with_butterworth_filter(walk_df)
 
         #keep fixed portiin of data
-        start = 0
-        end = 1500
-        for i in range(0,11):
+        start = 400
+        end = 1900
+        for i in range(0,10):
 
             df = get_fixed_portion(walk_df, start, end)
             name = 'walk_' + foot + '_' + subject + '_' + secs + '_' + str(i) + '.csv'
             clean_folder= str(Path('./filtered_data/walk/' + name))
-            walk_df.to_csv(os.path.join(clean_folder), index=False)
+            df.to_csv(os.path.join(clean_folder), index=False)
 
             start += 750
             end += 750
@@ -117,14 +117,14 @@ def main():
         # remove noise using butterworth filter
         stairs_df = remove_noise_with_butterworth_filter(stairs_df)
         #keep fixed portiin of data
-        start = 0
-        end = 1500
-        for i in range(0,11):
+        start = 400
+        end = 1900
+        for i in range(0,10):
 
             df = get_fixed_portion(stairs_df, start, end)
             name = 'upstairs_' + foot + '_' + subject + '_' + secs + '_' + str(i) + '.csv'
             clean_folder= str(Path('./filtered_data/upstairs/' + name))
-            stairs_df.to_csv(os.path.join(clean_folder), index=False)
+            df.to_csv(os.path.join(clean_folder), index=False)
 
             start += 750
             end += 750
@@ -141,7 +141,7 @@ def main():
     stairs_df = pd.concat(list_, axis=0, ignore_index=True)
     # print(stairs_df)
 
-    #stairs_data
+    #downstairs_data
     list_ = []
     for filename in downstair_data_files:
         print ("processing file: ", filename)
@@ -152,18 +152,21 @@ def main():
         stairs_df = stairs_df.assign(subject_number = subject, foot = foot)
 
         # keep data within a certain time period, this hopefully gets rid of outliers
+        print(stairs_df.shape)
         stairs_df = remove_outliers(stairs_df)
+        print(stairs_df.shape)
         # remove noise using butterworth filter
         stairs_df = remove_noise_with_butterworth_filter(stairs_df)
         #keep fixed portiin of data
-        start = 0
-        end = 1500
-        for i in range(0,11):
+        start = 400
+        end = 1900
+        for i in range(0,10):
 
             df = get_fixed_portion(stairs_df, start, end)
+            print(df.shape)
             name = 'downstairs_' + foot + '_' + subject + '_' + secs + '_' + str(i) + '.csv'
             clean_folder= str(Path('./filtered_data/downstairs/' + name))
-            stairs_df.to_csv(os.path.join(clean_folder), index=False)
+            df.to_csv(os.path.join(clean_folder), index=False)
 
             start += 750
             end += 750
