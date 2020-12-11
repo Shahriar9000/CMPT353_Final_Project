@@ -7,8 +7,16 @@ currentdir = os.getcwd()
 walking = os.path.join(currentdir, 'filtered_data/walk')
 upstairs = os.path.join(currentdir, 'filtered_data/upstairs')
 downstairs = os.path.join(currentdir, 'filtered_data/downstairs')
-print (currentdir)
+# print (currentdir)
 x = pd.DataFrame()
+
+def get_subject_and_foot(filename):
+    base  = os.path.basename(filename)
+    base = base.split(".")
+    subject = base[0].split('_')
+    subject, foot, secs, file_number = subject[2], subject[1], subject[3], subject[4]
+
+    return (subject, foot, secs, file_number)
 
 def allData(dirname, action):
     global x
@@ -29,79 +37,31 @@ def allData(dirname, action):
         noise_filtered['py'] = noise_filtered['vy']*noise_filtered['del_t']
         noise_filtered['pz'] = noise_filtered['vz']*noise_filtered['del_t']
 
+        speed = None
+        if (action in ['walking', 'jogging', 'running']):
+            subject, foot, secs, file_number = get_subject_and_foot(filename)
+            speed = 19.5/float(secs) # m/s
+
+        # print(noise_filtered)
+
         # noise_filtered = noise_filtered.drop(['ax', 'ay', 'az'], axis = 1).copy()
         noise_filtered = noise_filtered.drop(['time', 'prev_time', 'del_t'], axis = 1).copy()
         noise_filtered = noise_filtered.drop(noise_filtered.index[0])
 
         noise_filtered = noise_filtered.values.flatten()
         noise_filtered = pd.DataFrame(noise_filtered).transpose()
-        action_col = pd.DataFrame([[action]], columns=['action'])
+        action_col = pd.DataFrame([[action, speed]], columns=['action', 'speed'])
         noise_filtered = pd.concat([action_col, noise_filtered], axis=1)
         # print(noise_filtered.shape)
         x = x.append(noise_filtered)
 
 
-        # print (noise_filtered.shape)
-        # df_1 = noise_filtered#.iloc[:150,:]
-        # print (df_1.shape)
-        # df_2 = noise_filtered.iloc[225:,:]
-        # print (df_2.shape)
-        # scaler = StandardScaler()
-        # X = scaler.fit_transform(X)
-        # print(noise_filtered)
+def createMlData():
+    allData(walking, 'walking')
+    allData(upstairs, 'upstairs')
+    allData(downstairs, 'downstairs')
+    print(x.shape)
+    x.to_csv('.\ml_input_data.csv', index=False)
 
-        # action_col = pd.DataFrame([[action]], columns=['action'])
-        # df_1 = df_1.values.flatten()
-        # df_1 = pd.DataFrame(df_1).transpose()
-        # df_1 = pd.concat([action_col, df_1], axis=1)
-        # x = x.append(df_1)
-        # print("df_1", df_1)
-        # df_2 = df_2.values.flatten()
-        # df_2 = pd.DataFrame(df_2).transpose()
-        # df_2 = pd.concat([action_col, df_2], axis=1)
-        # x = x.append(df_2)
-
-        # print (t)
-
-        # print(i)
-        # x = x.append(i)
-        # x ['action'] = action
-        # print (noise_filtered)
-
-
-
-allData(walking, 'walking')
-allData(upstairs, 'upstairs')
-allData(downstairs, 'downstairs')
-X = x.loc[:, x.columns != 'action']
-y = x['action']
-
-print (x)
-
-from sklearn.preprocessing import StandardScaler
-from sklearn.neighbors import KNeighborsClassifier
-from sklearn.model_selection import train_test_split
-
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, stratify = y)
-
-model = KNeighborsClassifier(5)
-model.fit(X_train, y_train)
-print(model.score(X_train, y_train))
-print(model.score(X_test, y_test))
-
-# y = pd.DataFrame()
-# for filename in os.listdir(stairs):
-#     print ("!!!!!!!!!!!!!!!!!!",filename)
-#     file = os.path.join(walking, filename)
-#     print (file)
-#     data = pd.read_csv(file)
-#     print (data)
-#     noise_filtered = data[["ax","ay","az"]].copy()
-#     print(noise_filtered)
-#     t = noise_filtered.values.flatten()
-#     print (t)
-#     i = pd.DataFrame(t).transpose()
-#     print(i)
-#     y = y.append(i)
-#     y ['action'] = 'staris'
-# print (y)
+if __name__ == '__main__':
+    createMlData()

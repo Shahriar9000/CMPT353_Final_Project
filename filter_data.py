@@ -20,12 +20,16 @@ def get_fixed_portion(df, start, end):
     df = df.loc[start:end+1]
     return df
 
-
+# B, A = signal.butter(5, 0.2, output='ba')
 # Butterfly filter https://ggbaker.ca/data-science/content/filtering.html#filtering
 def remove_noise_with_butterworth_filter(df):
+    # df.plot(x='time', y=features)
     for col in features:
-        b, a = signal.butter(3, 0.8, btype='lowpass', analog=False)
+        # b, a = signal.butter(3, 0.8, btype='lowpass', analog=False)
+        b, a = signal.butter(3, 0.012, btype='lowpass')
         df[col] = signal.filtfilt(b, a, df[col])
+    # df.plot(x='time', y=features)
+    # plt.show()
     return df
 
 def get_subject_and_foot(filename):
@@ -37,10 +41,13 @@ def get_subject_and_foot(filename):
     return (subject, foot, secs)
 
 def plot_data(df):
-        # df.plot(x = "time", y = features[:3],  title = "G-Force")
-        df.plot(x = "time", y = features[3:6],  title = "Linear Acceleration")
-        # df.plot(x = "time", y = features[6:9], ,title ="Angular Velocity")
-        plt.show()
+    # df.plot(x = "time", y = features[:3],  title = "G-Force")
+    df.plot(x = "time", y = features[3:6],  title = "Linear Acceleration")
+    # df.plot(x = "time", y = features[6:9], ,title ="Angular Velocity")
+    plt.show()
+
+# def plot_data_comparison(df):
+#     df.plot(x='time', y=[])
 
 def get_file(filename):
     file = filename.strip('')
@@ -76,13 +83,18 @@ def main():
 
         walk_df = remove_outliers(walk_df)
 
-
+        # df_before_filter = walk_df.copy()
+        # df_before_filter = df_before_filter.add_prefix('before_')
         # remove noise using butterworth filter
         walk_df = remove_noise_with_butterworth_filter(walk_df)
 
+        # df_before_filter = pd.concat([walk_df, df_before_filter], axis=1)
+        # print(df_before_filter)
+        # df_before_filter.plot(x = 'time', y = ['ax','before_ax'])
+        # plt.show()
         #keep fixed portiin of data
         start = 400
-        end = 1900
+        end = 1400
         for i in range(0,10):
 
             df = get_fixed_portion(walk_df, start, end)
@@ -90,8 +102,8 @@ def main():
             clean_folder= str(Path('./filtered_data/walk/' + name))
             df.to_csv(os.path.join(clean_folder), index=False)
 
-            start += 750
-            end += 750
+            start += 500
+            end += 500
 
 
         # name = 'walk_' + foot + '_' + subject + '_' +secs + '.csv'
@@ -118,7 +130,7 @@ def main():
         stairs_df = remove_noise_with_butterworth_filter(stairs_df)
         #keep fixed portiin of data
         start = 400
-        end = 1900
+        end = 1400
         for i in range(0,10):
 
             df = get_fixed_portion(stairs_df, start, end)
@@ -126,8 +138,8 @@ def main():
             clean_folder= str(Path('./filtered_data/upstairs/' + name))
             df.to_csv(os.path.join(clean_folder), index=False)
 
-            start += 750
-            end += 750
+            start += 500
+            end += 500
 
 
         # name = 'stairs_' + foot + '_' + subject + '.csv'
@@ -152,24 +164,21 @@ def main():
         stairs_df = stairs_df.assign(subject_number = subject, foot = foot)
 
         # keep data within a certain time period, this hopefully gets rid of outliers
-        print(stairs_df.shape)
         stairs_df = remove_outliers(stairs_df)
-        print(stairs_df.shape)
         # remove noise using butterworth filter
         stairs_df = remove_noise_with_butterworth_filter(stairs_df)
         #keep fixed portiin of data
         start = 400
-        end = 1900
+        end = 1400
         for i in range(0,10):
 
             df = get_fixed_portion(stairs_df, start, end)
-            print(df.shape)
             name = 'downstairs_' + foot + '_' + subject + '_' + secs + '_' + str(i) + '.csv'
             clean_folder= str(Path('./filtered_data/downstairs/' + name))
             df.to_csv(os.path.join(clean_folder), index=False)
 
-            start += 750
-            end += 750
+            start += 500
+            end += 500
 
 
         # name = 'stairs_' + foot + '_' + subject + '.csv'
