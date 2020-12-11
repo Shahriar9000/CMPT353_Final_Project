@@ -37,7 +37,7 @@ def allData(dirname, action):
         noise_filtered = pd.DataFrame(noise_filtered).transpose()
         action_col = pd.DataFrame([[action]], columns=['action'])
         noise_filtered = pd.concat([action_col, noise_filtered], axis=1)
-        print(noise_filtered.shape)
+        # print(noise_filtered.shape)
         x = x.append(noise_filtered)
 
 
@@ -84,7 +84,7 @@ from sklearn.model_selection import train_test_split
 
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state = 0, stratify = y)
 
-model = KNeighborsClassifier(7)
+model = KNeighborsClassifier(5)
 model.fit(X_train, y_train)
 print(model.score(X_train, y_train))
 print(model.score(X_test, y_test))
